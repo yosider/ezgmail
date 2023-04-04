@@ -289,6 +289,7 @@ class GmailMessage:
             # for header in messageObj['payload']['headers']:
             #    if header['name'].upper() == 'CONTENT-TYPE':
             #        emailEncoding = _parseContentTypeHeaderForEncoding(header['value'])
+            emailEncoding = "UTF-8"
             self.originalBody = base64.urlsafe_b64decode(messageObj["payload"]["body"]["data"]).decode(emailEncoding)
             self.body = removeQuotedParts(self.originalBody)
 
@@ -453,12 +454,13 @@ class GmailMessage:
 
 def _parseContentTypeHeaderForEncoding(value):
     """Helper function called by GmailMessage:__init__()."""
-    mo = re.search('charset="(.*?)"', value)
-    if mo is None:
-        emailEncoding = "UTF-8"  # We're going to assume UTF-8 and hope for the best. "Safety not guaranteed."
-    else:
-        emailEncoding = mo.group(1)
-    return emailEncoding
+    # mo = re.search('charset="(.*?)"', value)
+    # if mo is None:
+    #     emailEncoding = "UTF-8"  # We're going to assume UTF-8 and hope for the best. "Safety not guaranteed."
+    # else:
+    #     emailEncoding = mo.group(1)
+    # return emailEncoding
+    return "UTF-8"
 
 
 def init(userId="me", tokenFile="token.json", credentialsFile="credentials.json", _raiseException=True):

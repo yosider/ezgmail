@@ -166,14 +166,26 @@ class GmailThread:
 def removeQuotedParts(emailText):
     """Returns the text in ``emailText`` up to the quoted "reply" text that begins with
     "On Sun, Jan 1, 2018 at 12:00 PM al@inventwithpython.com wrote:" part."""
-    replyPattern = re.compile(
-        r"On (Sun|Mon|Tue|Wed|Thu|Fri|Sat), (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d+, \d\d\d\d at \d+:\d+ (AM|PM) (.*?) wrote:"
-    )
-
-    mo = replyPattern.search(emailText)
-    if mo is None:
+    # replyPattern = re.compile(
+    #     r"On (Sun|Mon|Tue|Wed|Thu|Fri|Sat), (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d+, \d\d\d\d at \d+:\d+ (AM|PM) (.*?) wrote:"
+    # )
+    replyPatterns = [
+        # On 2023/03/31 16:23, john@gmail.com wrote:
+        re.compile(r"\nOn (.*) wrote:[\r\n]+"),
+        # 2023/3/31 John Doe <john@gmail.com>
+        # From: John Doe <john@gmail.com>
+        re.compile(r"\n.*<.*@.*>[\r\n]+"),
+        # ---------- Forwarded message ---------
+        re.compile(r"\n-+.*Forwarded message.*-+[\r\n]+"),
+        # -----Original Message-----ma
+        re.compile(r"\n-+.*Original Message.*-+[\r\n]+"),
+    ]
+    match_objs = [pattern.search(emailText) for pattern in replyPatterns]
+    match_objs = list(filter(None, match_objs))
+    if len(match_objs) == 0:
         return emailText
     else:
+        mo = min(match_objs, key=lambda mo: mo.start())
         return emailText[: mo.start()]
 
 
